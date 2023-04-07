@@ -2,6 +2,7 @@ import sys
 from parser import Parser
 from errors import ArgsNumError, TaskTypeError
 from scramblers import Caesar, Vigenere, Vernam
+from hack import HackCaesar
 
 inpt = Parser()
 
@@ -16,8 +17,9 @@ try:
     inpt.path = sys.argv[2]
     if (inpt.task == 'e' or inpt.task == 'd') and len(sys.argv) < 5:
         raise ArgsNumError('2 or 3 args, at least 4 needed')
-    inpt.cyp_type = sys.argv[3]
-    inpt.key = sys.argv[4]
+    elif inpt.task == 'e' or inpt.task == 'd':
+        inpt.cyp_type = sys.argv[3]
+        inpt.key = sys.argv[4]
 except ArgsNumError as mr:
     print(mr)
 except TaskTypeError as mr:
@@ -34,7 +36,8 @@ else:
 
     if inpt.task == 'd':
         encr.decrypt_message()
-        print(encr.key)
     elif inpt.task == 'e':
         encr.encrypt_message()
-        print(encr.key)
+    elif inpt.task == 'h':
+        t = HackCaesar(inpt.task, inpt.path, inpt.cyp_type, inpt.key)
+        t.hack()
