@@ -36,9 +36,9 @@ class Parser:
 
     @task.setter
     def task(self, a):
-        if a not in {'e', 'd', 'h'}:
+        if a.lower() not in {'e', 'd', 'h'}:
             raise TaskTypeError('wrong command type')
-        self._task = a
+        self._task = a.lower()
 
     @path.setter
     def path(self, a):
@@ -50,19 +50,19 @@ class Parser:
 
     @cyp_type.setter
     def cyp_type(self, a):
-        if a not in {'Ca', 'Vi', 'Ve'}:
+        if a.lower() not in {'ca', 'vi', 've'}:
             raise TaskTypeError('wrong cypher type')
-        self._cyp_type = a
+        self._cyp_type = a.lower()
 
     @key.setter
     def key(self, a):
-        if self.cyp_type == 'Ca' and not a.isdigit():
+        if self.cyp_type.lower() == 'ca' and not a.isdigit():
             raise TaskTypeError('wrong key type')
         self._key = a
 
 
 class Caesar(Parser):
-    def __init__(self, task='default_1', path='default_2', cyp_type='Ca', key='default_4'):
+    def __init__(self, task='default_1', path='default_2', cyp_type='ca', key='default_4'):
         super().__init__()
         self._alphabet = dict()
         self._task = task
@@ -75,7 +75,7 @@ class Caesar(Parser):
         return self._alphabet
 
     def decrypt_alphabet(self):
-        if self._cyp_type == 'Ca':
+        if self._cyp_type.lower() == 'ca':
             for k in range(33, 126):
                 if k - int(self._key) < 0:
                     self._alphabet.update({chr(k): chr((k - int(self._key)) + 126)})
@@ -83,12 +83,38 @@ class Caesar(Parser):
                     self._alphabet.update({chr(k): chr(k - int(self._key))})
 
     def encrypt_alphabet(self):
-        if self._cyp_type == 'Ca':
+        if self._cyp_type.lower() == 'ca':
             for k in range(33, 126):
                 if k + int(self._key) > 125:
                     self._alphabet.update({chr(k): chr((k + int(self._key)) % 126 + 33)})
                 else:
                     self._alphabet.update({chr(k): chr(k + int(self._key))})
+
+    def encrypt_message(self):
+        f = open(self._path, 'r')
+        w = open('output_ca_en.txt', 'w')
+        self.encrypt_alphabet()
+        for sym in f.read():
+            if ord(sym) > 125 or ord(sym) < 33:
+                w.write(sym)
+            else:
+                w.write(self._alphabet[sym])
+        f.close()
+        w.close()
+        return w
+
+    def decrypt_message(self):
+        f = open(self._path, 'r')
+        w = open('output_ca_de.txt', 'w')
+        self.decrypt_alphabet()
+        for sym in f.read():
+            if ord(sym) > 125 or ord(sym) < 33:
+                w.write(sym)
+            else:
+                w.write(self._alphabet[sym])
+        f.close()
+        w.close()
+        return w
 
 
 class Vigenere(Parser):
@@ -100,20 +126,37 @@ class Vigenere(Parser):
         self._key = key
         self._edited_key = ''
         f = open(self.path, 'r')
-        ln = len(f.read().replace(' ', ''))
-        for i in range(ln):
-            self._edited_key += self._key[i % len(self._key)]
+        fin_len = len(f.read().replace(' ', ''))
+        bas_len = len(self._key)
+        self._edited_key = self._key * (fin_len // bas_len)
+        for i in range(fin_len % bas_len):
+            self._edited_key += self._key[i]
         f.close()
 
     def encrypt_message(self):
         f = open(self._path, 'r')
-        w = open('output.txt', 'w')
+        w = open('output_vi_en.txt', 'w')
         cnt = 0
         for sym in f.read():
             if ord(sym) > 125 or ord(sym) < 33:
                 w.write(sym)
             else:
-                new_idx = ((ord(sym) - 33) + ord(self._edited_key[cnt]) - 33) % 93 + 33
+                new_idx = (ord(sym) - 33 + ord(self._edited_key[cnt]) - 33) % 93 + 33
+                w.write(chr(new_idx))
+                cnt += 1
+        f.close()
+        w.close()
+        return w
+
+    def decrypt_message(self):
+        f = open(self._path, 'r')
+        w = open('output_vi_de.txt', 'w')
+        cnt = 0
+        for sym in f.read():
+            if ord(sym) > 125 or ord(sym) < 33:
+                w.write(sym)
+            else:
+                new_idx = ((ord(sym) - 33) - (ord(self._edited_key[cnt]) - 33)) % 93 + 33
                 w.write(chr(new_idx))
                 cnt += 1
         f.close()
@@ -143,6 +186,15 @@ except TaskTypeError as mr:
 except FileNotFoundError:
     print('wrong path')
 else:
-    encr = Vigenere(inpt.task, inpt.path, inpt.cyp_type, inpt.key)
-    encr.encrypt_message()
-    print(inpt.task, inpt.path, inpt.cyp_type, inpt.key)
+    if inpt.cyp_type == 'ca':
+        encr = Caesar(inpt.task, inpt.path, inpt.cyp_type, inpt.key)
+    elif inpt.cyp_type == 'vi':
+        encr = Vigenere(inpt.task, inpt.path, inpt.cyp_type, inpt.key)
+
+    if inpt.task == 'd':
+        encr.decrypt_message()
+        print(encr.key)
+    elif inpt.task == 'e':
+        encr.encrypt_message()
+        print(encr.key)
+
