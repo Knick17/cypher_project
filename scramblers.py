@@ -2,13 +2,19 @@ from parser import Parser
 
 
 class Caesar(Parser):
-    def __init__(self, task='default_1', path='default_2', cyp_type='ca', key='default_4'):
-        super().__init__()
+    def __init__(self, pars, readsaver):
+        super().__init__(readsaver)
+        self._input_path = readsaver.input_path
+        self._output_path = readsaver.output_path
+        self._input_text = readsaver.input_text
+        self._input_file = readsaver.input_file
+        self._output_file = readsaver.input_file
+
+        self._task = pars.task
+        self._cyp_type = pars.cyp_type
+        self._key = pars.key
+
         self._alphabet = dict()
-        self._task = task
-        self._path = path
-        self._cyp_type = cyp_type
-        self._key = key
 
     @property
     def alphabet(self):
@@ -31,121 +37,131 @@ class Caesar(Parser):
                     self._alphabet.update({chr(k): chr(k + int(self._key))})
 
     def encrypt_message(self):
-        f = open(self._path, 'r')
-        w = open('output_ca_en.txt', 'w')
         self.encrypt_alphabet()
-        for sym in f.read():
+        self.Open()
+        self.Read()
+        for sym in self._input_text:
             if ord(sym) > 125 or ord(sym) < 33:
-                w.write(sym)
+                self.Write(sym)
             else:
-                w.write(self._alphabet[sym])
-        f.close()
-        w.close()
-        return w
+                self.Write(self._alphabet[sym])
+        self.Close()
 
     def decrypt_message(self):
-        f = open(self._path, 'r')
-        w = open('output_ca_de.txt', 'w')
         self.decrypt_alphabet()
-        for sym in f.read():
+        self.Open()
+        self.Read()
+        for sym in self.input_text:
             if ord(sym) > 125 or ord(sym) < 33:
-                w.write(sym)
+                self.Write(sym)
             else:
-                w.write(self._alphabet[sym])
-        f.close()
-        w.close()
-        return w
+                self.Write(self._alphabet[sym])
+        self.Close()
 
 
 class Vigenere(Parser):
-    def __init__(self, task='default_1', path='default_2', cyp_type='Vi', key='default_4'):
-        super().__init__()
-        self._task = task
-        self._path = path
-        self._cyp_type = cyp_type
-        self._key = key
+    def __init__(self, pars, readsaver):
+        super().__init__(readsaver)
+        self._input_path = readsaver.input_path
+        self._output_path = readsaver.output_path
+        self._input_text = readsaver.input_text
+        self._input_file = readsaver.input_file
+        self._output_file = readsaver.input_file
+
+        self._task = pars.task
+        self._cyp_type = pars.cyp_type
+        self._key = pars.key
+
         self._edited_key = ''
-        f = open(self.path, 'r')
-        fin_len = len(f.read().replace(' ', ''))
+
+    def make_edited_key(self):
+        self.Open()
+        self.Read()
+        fin_len = len(self.input_text.replace(' ', ''))
         bas_len = len(self._key)
         self._edited_key = self._key * (fin_len // bas_len)
         for i in range(fin_len % bas_len):
             self._edited_key += self._key[i]
-        f.close()
+        self.Close()
 
     def encrypt_message(self):
-        f = open(self._path, 'r')
-        w = open('output_vi_en.txt', 'w')
+        self.make_edited_key()
+        self.Open()
+        self.Read()
         cnt = 0
-        for sym in f.read():
+        for sym in self.input_text:
             if ord(sym) > 125 or ord(sym) < 33:
-                w.write(sym)
+                self.Write(sym)
             else:
                 new_idx = (ord(sym) - 33 + ord(self._edited_key[cnt]) - 33) % 93 + 33
-                w.write(chr(new_idx))
+                self.Write(chr(new_idx))
                 cnt += 1
-        f.close()
-        w.close()
-        return w
+        self.Close()
 
     def decrypt_message(self):
-        f = open(self._path, 'r')
-        w = open('output_vi_de.txt', 'w')
+        self.make_edited_key()
+        self.Open()
+        self.Read()
         cnt = 0
-        for sym in f.read():
+        for sym in self.input_text:
             if ord(sym) > 125 or ord(sym) < 33:
-                w.write(sym)
+                self.Write(sym)
             else:
                 new_idx = ((ord(sym) - 33) - (ord(self._edited_key[cnt]) - 33)) % 93 + 33
-                w.write(chr(new_idx))
+                self.Write(chr(new_idx))
                 cnt += 1
-        f.close()
-        w.close()
-        return w
+        self.Close()
 
 
 class Vernam(Parser):
-    def __init__(self, task='default_1', path='default_2', cyp_type='Vi', key='default_4'):
-        super().__init__()
-        self._task = task
-        self._path = path
-        self._cyp_type = cyp_type
-        self._key = key
+    def __init__(self, pars, readsaver):
+        super().__init__(readsaver)
+        self._input_path = readsaver.input_path
+        self._output_path = readsaver.output_path
+        self._input_text = readsaver.input_text
+        self._input_file = readsaver.input_file
+        self._output_file = readsaver.input_file
+
+        self._task = pars.task
+        self._cyp_type = pars.cyp_type
+        self._key = pars.key
+
         self._edited_key = ''
-        f = open(self.path, 'r')
-        fin_len = len(f.read().replace(' ', ''))
+
+    def make_edited_key(self):
+        self.Open()
+        self.Read()
+        fin_len = len(self.input_text.replace(' ', ''))
         bas_len = len(self._key)
         self._edited_key = self._key * (fin_len // bas_len)
         for i in range(fin_len % bas_len):
             self._edited_key += self._key[i]
-        f.close()
+        self.Close()
 
     def encrypt_message(self):
-        f = open(self._path, 'r')
-        w = open('output_ve_en.txt', 'w')
+        self.make_edited_key()
+        self.Open()
+        self.Read()
         cnt = 0
-        for sym in f.read():
+        for sym in self.input_text:
             if ord(sym) > 125 or ord(sym) < 33:
-                w.write(sym)
+                self.Write(sym)
             else:
                 new_idx = ((ord(sym) - 33) + (ord(self._edited_key[cnt]) - 33)) % 93 + 33
-                w.write(chr(new_idx))
+                self.Write(chr(new_idx))
                 cnt += 1
-        f.close()
-        w.close()
-        return w
+        self.Close()
 
     def decrypt_message(self):
-        f = open(self._path, 'r')
-        w = open('output_ve_de.txt', 'w')
+        self.make_edited_key()
+        self.Open()
+        self.Read()
         cnt = 0
-        for sym in f.read():
+        for sym in self.input_text:
             if ord(sym) > 125 or ord(sym) < 33:
-                w.write(sym)
+                self.Write(sym)
             else:
                 new_idx = ((ord(sym) - 33) - (ord(self._edited_key[cnt]) - 33)) % 93 + 33
-                w.write(chr(new_idx))
+                self.Write(chr(new_idx))
                 cnt += 1
-        f.close()
-        w.close()
-        return w
+        self.Close()
