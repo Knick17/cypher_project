@@ -1,8 +1,8 @@
 import sys
-from parser import Parser, ReadSaver
-from errors import ArgsNumError, TaskTypeError
-from scramblers import Caesar, Vigenere, Vernam
-from hack import HackCaesar
+from scripts.parser import ReadSaver, Parser
+from scripts.errors import ArgsNumError, TaskTypeError
+from scripts.scramblers import Caesar, Vigenere, Vernam
+from scripts.hack import HackCaesar
 
 task = ''
 path = ''
@@ -31,19 +31,19 @@ try:
         key = sys.argv[4]
 
     if task == 'h':
-        outpath = 'hacked.txt'
+        outpath = 'hacked/hacked.txt'
     if task == 'e' and cyp_type == 'ca':
-        outpath = 'output_caesar_encrypted.txt'
+        outpath = 'encrypted/output_caesar_encrypted.txt'
     elif task == 'd' and cyp_type == 'ca':
-        outpath = 'output_caesar_decrypted.txt'
+        outpath = 'decrypted/output_caesar_decrypted.txt'
     elif task == 'e' and cyp_type == 'vi':
-        outpath = 'output_vigenere_encrypted.txt'
+        outpath = 'encrypted/output_vigenere_encrypted.txt'
     elif task == 'd' and cyp_type == 'vi':
-        outpath = 'output_vigenere_decrypted.txt'
+        outpath = 'decrypted/output_vigenere_decrypted.txt'
     elif task == 'e' and cyp_type == 've':
-        outpath = 'output_vernam_encrypted.txt'
+        outpath = 'encrypted/output_vernam_encrypted.txt'
     elif task == 'd' and cyp_type == 've':
-        outpath = 'output_vernam_decrypted.txt'
+        outpath = 'decrypted/output_vernam_decrypted.txt'
 
     rs.output_path = outpath
 
@@ -66,7 +66,6 @@ else:
     elif inpt.cyp_type == 'ca' and inpt.task == 'e':
         encr = Caesar(inpt, rs)
         encr.encrypt_message()
-        print(encr.alphabet)
     elif inpt.cyp_type == 'vi' and inpt.task == 'd':
         encr = Vigenere(inpt, rs)
         encr.decrypt_message()

@@ -1,4 +1,4 @@
-from parser import Parser
+from scripts.parser import Parser
 
 
 class Caesar(Parser):

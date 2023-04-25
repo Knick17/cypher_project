@@ -13,3 +13,6 @@ output_vi_de.txt
 output_vi_en.txt
 /.idea
 /__pycache__
+/encrypted
+/decrypted
+/hacked

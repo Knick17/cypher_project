@@ -1,4 +1,4 @@
-from parser import Parser
+from scripts.parser import Parser
 
 FREQ = ('e', 't', 'i', 'o', 'n', 's', 'r', 'h', 'l', 'd', 'c', 'u', 'm', 'f', 'p', 'g', 'w', 'y', 'b'
                                                                                                   'v', 'k', 'x', 'j',

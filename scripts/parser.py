@@ -1,4 +1,4 @@
-from errors import TaskTypeError
+from scripts.errors import TaskTypeError
 
 
 class ReadSaver:
