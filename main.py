@@ -1,8 +1,15 @@
 import sys
+import os
 from scripts.parser import ReadSaver, Parser
 from scripts.errors import ArgsNumError, TaskTypeError
 from scripts.scramblers import Caesar, Vigenere, Vernam
 from scripts.hack import HackCaesar
+
+if not os.path.exists('encrypted'):
+   os.makedirs('encrypted')
+
+if not os.path.exists('decrypted'):
+   os.makedirs('decrypted')
 
 task = ''
 path = ''
